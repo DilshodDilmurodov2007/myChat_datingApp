@@ -14,4 +14,4 @@ import { createWelcomeEmailTemplate } from "./emailTemplate.js"
     }
     console.log("Welcome Email Send Successfully", data);
  }
- 
+  
