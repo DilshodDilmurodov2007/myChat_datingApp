@@ -30,9 +30,11 @@ export const signup = async (req, res) => {
         email,
         password: hashedPassword
     })
-    if(newUser) {
-        generateToken(newUser.__id, res)
-        await newUser.save()
+    if (newUser) {
+        // Persist user first, then issue auth cookie
+        const savedUser = await newUser.save()
+        generateToken(savedUser.__id, res)
+
         res.status(201).json({
             __id: newUser.__id,
             fullName: newUser.fullName,
