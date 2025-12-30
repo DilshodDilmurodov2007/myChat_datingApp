@@ -90,21 +90,52 @@ export const logout = async (_, res) => {
    res.status(200).json({message: "Logout successfully!"})
 }
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 export const updateProfile = async (req, res) => {
-    try {
-        const {profilePic} = req.body
-        if (!profilePic) return res.status(400).json({message: "Profile pic is required"})
-        
-        const userId = req.user.id
+  try {
+    const { profilePic } = req.body
 
-        const uploadResponse = await cloudinary.uploader(profilePic)
-        const updatedUser =  await User.findByIdAndUpdate(userId, {profilePic: uploadResponse.secure_url},
-            {new: true}
-        )
-        
-        res.status(200).json(updatedUser)
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({message: "Internal Server Error"})
+    if (!profilePic) {
+      return res.status(400).json({ message: 'Profile pic is required' })
     }
+
+    if (!req.user?.id) {
+      return res.status(401).json({ message: 'Unauthorized' })
+    }
+
+    // 🧠 Decode base64 and check size
+    const base64Data = profilePic.split(',')[1]
+    if (!base64Data) {
+      return res.status(400).json({ message: 'Invalid image format' })
+    }
+
+    const buffer = Buffer.from(base64Data, 'base64')
+
+    if (buffer.length > MAX_FILE_SIZE) {
+      return res.status(413).json({
+        message: 'Image too large. Maximum size is 5MB.'
+      })
+    }
+
+    const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+      folder: 'profile_pictures',
+      resource_type: 'image',
+      transformation: [
+        { width: 512, height: 512, crop: 'limit' },
+        { quality: 'auto', fetch_format: 'auto' }
+      ]
+    })
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { profilePic: uploadResponse.secure_url },
+      { new: true, select: '-password' }
+    )
+
+    res.status(200).json(updatedUser)
+  } catch (error) {
+    console.error('Update profile error:', error)
+    res.status(500).json({ message: 'Internal Server Error' })
+  }
 }
+
