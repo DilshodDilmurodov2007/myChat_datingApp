@@ -1,8 +1,31 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useChatStore } from '../store/useChatStore'
+import { useAuthStore } from '../store/useAuthStore'
+import ChatHeader from './chatpanel/ChatHeader'
+import ChatMessages from './chatpanel/ChatMessages'
+import ChatInput from './chatpanel/ChatInput'
+import NoChatHistoryPlaceholder from './chatpanel/NoChatHistoryPlaceholder'
+import { LoaderIcon } from 'lucide-react'
 
 function ChatContaioner() {
+  const {getMessagesWithUserId, selectedUser, messages, isMessagesLoading} = useChatStore()
+  const {authUser} = useAuthStore()
+  useEffect(() => { 
+    getMessagesWithUserId(selectedUser._id)
+  }, [selectedUser, getMessagesWithUserId])
+  if(isMessagesLoading) return  <div className="h-screen flex items-center justify-center">
+    <LoaderIcon className="size-10 animate-spin" />
+  </div>;
   return (
-    <div>ChatContaioner</div>
+    <div>
+      <ChatHeader />
+      <div className='flex-1 px-6 overflow-auto py-8 h-100vh'>
+        {messages.length > 0 ? (<ChatMessages authUser={authUser} messages={messages} selectedUser={selectedUser} />): (
+          <NoChatHistoryPlaceholder name={selectedUser.fullName} />
+        )}
+      </div>
+      <ChatInput />
+    </div>
   )
 }
 

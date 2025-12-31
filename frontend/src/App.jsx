@@ -7,6 +7,7 @@ import { useAuthStore } from './store/useAuthStore'
 import PageLoader from './components/PageLoader'
 import NotAvailable from './pages/NotAvailable'
 import { Toaster } from 'react-hot-toast';
+import { useChatStore } from './store/useChatStore'
 
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
   }, [checkAuth])
 
   if (isCheckingAuth) return <PageLoader />;
-
+  
   return (
       <div className='min-h-screen bg-gray-950 relative flex items-center justify-center overflow-hidden'>
           <Toaster />

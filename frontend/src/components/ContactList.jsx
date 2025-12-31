@@ -16,7 +16,7 @@ function ContactList() {
 
   return (
     <div className='space-y-2'>
-      {allContacts.map((contact) => (
+      {allContacts?.map((contact) => (
         <div 
           key={contact._id} 
           className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200
@@ -35,7 +35,9 @@ function ContactList() {
           </div>
           <div className='flex-1 min-w-0'>
             <h4 className='text-slate-100 font-semibold truncate'>{contact.fullName}</h4>
-            <p className='text-gray-300 text-sm truncate'>{contact.lastMessage || 'No messages yet'}</p>
+            <p className='text-gray-300 text-sm truncate'>
+             {contact.lastMessage?.text === "hidden_written_text@$$@123" ? "sent an image" : contact.lastMessage?.text || 'No messages yet'}
+            </p>
           </div>
         </div>
       ))}

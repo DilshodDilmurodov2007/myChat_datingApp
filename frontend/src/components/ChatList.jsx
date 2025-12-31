@@ -34,7 +34,9 @@ function ChatList() {
           </div>
           <div className='flex-1 min-w-0'>
             <h4 className='text-slate-100 font-semibold truncate'>{item.fullName}</h4>
-            <p className='text-gray-300 text-sm truncate'>{item.lastMessage || 'No messages yet'}</p>
+            <p className='text-gray-300 text-sm truncate'>
+              {item.lastMessage?.text === "hidden_written_text@$$@123" ? "sent an image" : item.lastMessage?.text || 'No messages yet'}
+            </p>
           </div>
         </div>
       ))}
