@@ -6,7 +6,7 @@ import { useAuthStore } from '../store/useAuthStore';
 
 function ContactList() {
   const { getAllContacts, activeChat, allContacts, isUsersLoading, setSelectedUser } = useChatStore();
-  const { user } = useAuthStore();
+    const { onlineUsers } = useAuthStore();
   useEffect(() => {
     getAllContacts();
   }, [getAllContacts]);
@@ -31,7 +31,8 @@ function ContactList() {
               alt={contact.fullName} 
               className='w-12 h-12 rounded-full object-cover border border-gray-700' 
             />
-            <span className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full'></span>
+            <span className={`absolute bottom-0 right-0 w-3 h-3
+            ${onlineUsers.includes(contact._id) ? 'bg-green-500' : 'bg-gray-400'} border-2 border-gray-900 rounded-full`}></span>
           </div>
           <div className='flex-1 min-w-0'>
             <h4 className='text-slate-100 font-semibold truncate'>{contact.fullName}</h4>

@@ -8,11 +8,19 @@ import NoChatHistoryPlaceholder from './chatpanel/NoChatHistoryPlaceholder'
 import { LoaderIcon } from 'lucide-react'
 
 function ChatContaioner() {
-  const {getMessagesWithUserId, selectedUser, messages, isMessagesLoading} = useChatStore()
+  const {getMessagesWithUserId, selectedUser, messages, isMessagesLoading,
+    subscribeToMessage, unsubscribeToMessage
+  } = useChatStore()
   const {authUser} = useAuthStore()
+
   useEffect(() => { 
     getMessagesWithUserId(selectedUser._id)
-  }, [selectedUser, getMessagesWithUserId])
+    subscribeToMessage()
+
+    // clean up
+    return () => unsubscribeToMessage()
+  }, [selectedUser, getMessagesWithUserId, subscribeToMessage, unsubscribeToMessage])
+
   if(isMessagesLoading) return  <div className="h-screen flex items-center justify-center">
     <LoaderIcon className="size-10 animate-spin" />
   </div>;

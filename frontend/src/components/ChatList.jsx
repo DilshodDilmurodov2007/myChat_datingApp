@@ -2,9 +2,11 @@ import React, { useEffect } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import UsersLoaderSkeleton from './UsersLoaderSkeleton';
 import NoChatsFound from './NoChatsFound';
+import { useAuthStore } from '../store/useAuthStore';
 
 function ChatList() {
   const { getMyChatPartners, chats, activeChat, isUsersLoading, setSelectedUser } = useChatStore();
+  const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getMyChatPartners();
@@ -30,7 +32,8 @@ function ChatList() {
               alt={item.fullName} 
               className='w-12 h-12 rounded-full object-cover border border-gray-700' 
             />
-            <span className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full'></span>
+            <span className={`absolute bottom-0 right-0 w-3 h-3
+            ${onlineUsers.includes(item._id) ? 'bg-green-500' : 'bg-gray-400'} border-2 border-gray-900 rounded-full`}></span>
           </div>
           <div className='flex-1 min-w-0'>
             <h4 className='text-slate-100 font-semibold truncate'>{item.fullName}</h4>

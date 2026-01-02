@@ -3,6 +3,8 @@ import { useAuthStore } from '../store/useAuthStore'
 import { useChatStore } from '../store/useChatStore'
 import { LogOutIcon, VolumeOffIcon, Volume2Icon } from 'lucide-react'
 
+const notificationSound = new Audio("/sound/mouse-click.mp3")
+
 function ProfileHeader() {
   const { logout, authUser, updateProfile } = useAuthStore()
   const { isSoundEnabled, toggleSound } = useChatStore()
@@ -67,14 +69,25 @@ function ProfileHeader() {
         {/* Right Actions */}
         <div className="flex items-center gap-2">
           <button
-            onClick={toggleSound}
+            onClick={() => {
+              toggleSound();
+              // Play or pause the notification sound
+              if (isSoundEnabled) {
+                notificationSound.play();
+              }
+            }}
             className="btn btn-ghost btn-sm"
           >
             {isSoundEnabled ? <Volume2Icon size={18} /> : <VolumeOffIcon size={18} />}
           </button>
 
           <button
-            onClick={logout}
+            onClick={() => {
+              logout();
+               if (isSoundEnabled) {
+                notificationSound.play();
+              }
+            }}
             className="btn btn-ghost btn-sm text-error"
           >
             <LogOutIcon size={18} />
