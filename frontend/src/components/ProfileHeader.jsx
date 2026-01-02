@@ -26,7 +26,7 @@ function ProfileHeader() {
   }
 
   return (
-    <div className="p-4 border-b border-slate-700/50">
+    <div className="p-4 border-b border-slate-700/50 h-18">
       <div className="flex items-center justify-between">
 
         {/* Left: Avatar + Name */}

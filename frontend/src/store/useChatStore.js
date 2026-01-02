@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { useAuthStore } from "./useAuthStore";
 
 export const useChatStore = create((set, get) => ({
     allContacts: [],
@@ -30,36 +31,66 @@ export const useChatStore = create((set, get) => ({
             set({isMessagesLoading: false});
         }
     },
-    sendMessage: async(messageData) => {
-  const { selectedUser, messages, chats, allContacts } = get();
+    sendMessage: async (messageData) => {
+  const { selectedUser } = get();
+  const { authUser } = useAuthStore.getState();
+
+  if (!selectedUser || !authUser) return;
+
+  const tempId = `temp-${Date.now()}`;
+
+  const optimisticMessage = {
+    _id: tempId,
+    senderId: authUser._id,
+    receiver: selectedUser._id,
+    text: messageData.text,
+    image: messageData.image || null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    optimistic: true,
+  };
+
+  // 1️⃣ Optimistic UI update (SAFE)
+  set((state) => ({
+    messages: [...state.messages, optimisticMessage],
+  }));
+
   try {
-    const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
+    const res = await axiosInstance.post(
+      `/messages/send/${selectedUser._id}`,
+      messageData
+    );
 
-    // 1. Update messages state
-    set({ messages: [...messages, res.data] });
+    const realMessage = res.data;
 
-    // 2. Update lastMessage in chats array
-    const updatedChats = chats.map(chat => {
-      if (chat._id === selectedUser._id) {
-        return { ...chat, lastMessage: res.data };
-      }
-      return chat;
-    });
-    set({ chats: updatedChats });
-
-    // 3. Update lastMessage in allContacts array
-    const updatedContacts = allContacts.map(contact => {
-      if (contact._id === selectedUser._id) {
-        return { ...contact, lastMessage: res.data };
-      }
-      return contact;
-    });
-    set({ allContacts: updatedContacts });
-
+    // 2️⃣ Replace optimistic message with real one
+    set((state) => ({
+      messages: state.messages.map((msg) =>
+        msg._id === tempId ? realMessage : msg
+      ),
+      chats: state.chats.map((chat) =>
+        chat._id === selectedUser._id
+          ? { ...chat, lastMessage: realMessage }
+          : chat
+      ),
+      allContacts: state.allContacts.map((contact) =>
+        contact._id === selectedUser._id
+          ? { ...contact, lastMessage: realMessage }
+          : contact
+      ),
+    }));
   } catch (error) {
-    toast.error("Failed to send the message:", error?.response?.data?.message || "Unknown error");
+    // 3️⃣ Rollback optimistic message
+    set((state) => ({
+      messages: state.messages.filter((msg) => msg._id !== tempId),
+    }));
+
+    toast.error(
+      error?.response?.data?.message || "Failed to send message"
+    );
   }
-    },
+},
+
     getMyChatPartners: async () => {
   set({ isUsersLoading: true });
   try {

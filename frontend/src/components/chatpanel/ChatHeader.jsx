@@ -16,7 +16,7 @@ function ChatHeader() {
       }
     }, [selectedUser])
   return (
-    <div className='flex justify-between items-center p-4 border-b border-slate-700'>
+    <div className='flex justify-between items-center p-4 border-b border-slate-700 h-18'>
    
       <div className='flex items-center space-x-3'>
         <div className='avatar avatar-online'>

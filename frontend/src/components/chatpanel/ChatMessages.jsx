@@ -40,7 +40,7 @@ function ChatMessages({ authUser, messages, selectedUser }) {
     );
 
   return (
-    <div className="relative h-120">
+    <div className="relative h-full w-full">
       <div
         ref={containerRef}
         onScroll={handleScroll}
@@ -67,7 +67,7 @@ function ChatMessages({ authUser, messages, selectedUser }) {
                   {timeDisplay(msg.updatedAt) || ''}
                 </time>
               </div>
-              <div className={`chat-bubble ${isMe ? 'bg-blue-600' : 'bg-white/10'}`}>
+              <div className={`chat-bubble max-w-[70%] ${isMe ? 'bg-emerald-600' : 'bg-white/10'}`}>
                 {msg.image && (
                   <img
                     src={msg.image}
@@ -87,7 +87,7 @@ function ChatMessages({ authUser, messages, selectedUser }) {
       {showScrollButton && (
         <button
           onClick={() => scrollToBottom()}
-          className="absolute bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center transition"
+          className="absolute bottom-4 right-4 bg-emerald-600 hover:bg-emerald-500 text-white p-3 rounded-full shadow-lg flex items-center justify-center transition"
         >
           <ArrowDownIcon className="w-5 h-5" />
         </button>
